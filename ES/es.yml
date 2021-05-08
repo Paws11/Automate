@@ -1,0 +1,33 @@
+---
+- name: Setup ElasticSearch
+  hosts: _ES_1
+  connection: ssh
+  become: true
+  become_user: pawan
+  gather_facts: true
+  tasks:
+    - name: Download the zip and execute shell
+      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es2.sh
+
+
+- name: Setup ElasticSearch
+  hosts: _ES_2
+  connection: ssh
+  become: true
+  become_user: pawan
+  gather_facts: true
+  tasks:
+    - name: Download the zip and execute shell
+      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es2.sh
+
+
+- name: Setup ElasticSearch
+  hosts: _ES_3
+  connection: ssh
+  become: true
+  become_user: pawan
+  gather_facts: true
+  tasks:
+    - name: Download the zip and execute shell
+      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es3.sh
+
