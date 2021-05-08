@@ -196,13 +196,14 @@
              echo "pawan:12345" | sudo chpasswd
              mkdir -p /home/pawan/.ssh
              touch /home/pawan/.ssh/authorized_keys
-             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys
+             echo "" > /home/pawan/.ssh/authorized_keys
              chmod -R 700 /home/pawan/.ssh/
              echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
              chown -R pawan.pawan /home/pawan/.ssh
       instance_tags:
         Name: VM1
         ES: 1
+        Node: ES
   - name: vm2 creating with private ip
     ec2:
       instance_type: t2.micro
@@ -219,13 +220,14 @@
              echo "pawan:12345" | sudo chpasswd
              mkdir -p /home/pawan/.ssh
              touch /home/pawan/.ssh/authorized_keys
-             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys             
+             echo "" > /home/pawan/.ssh/authorized_keys
              chmod -R 700 /home/pawan/.ssh/
              echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
              chown -R pawan.pawan /home/pawan/.ssh
       instance_tags:
         Name: VM2
-        ES: 1
+        ES: 2
+        Node: ES
 
   - name: vm3 creating with private ip
     ec2:
@@ -243,12 +245,12 @@
              echo "pawan:12345" | sudo chpasswd
              mkdir -p /home/pawan/.ssh
              touch /home/pawan/.ssh/authorized_keys
-             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys
+             echo "" > /home/pawan/.ssh/authorized_keys
              chmod -R 700 /home/pawan/.ssh/
              echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
              chown -R pawan.pawan /home/pawan/.ssh
       instance_tags:
         Name: VM3
-        ES: 1
-
+        ES: 3
+        Node: ES
 
