@@ -1,0 +1,254 @@
+---
+- name: Play is to launch VPC
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  tasks:
+  - name: Creating a VPC named as "my-vpc" 
+    ec2_vpc_net:
+      name: my-vpc
+      cidr_block: 10.0.0.0/16
+      region: us-east-2
+      #    register: my_vpc
+
+  - name: TO get VPC_ID (custom)
+    command: aws ec2 describe-vpcs --filter Name=tag:Name,Values=my-vpc --query Vpcs[].VpcId --region us-east-2 --output text
+    register: VPC_ID
+
+  - name: Set VPC ID in variable
+    set_fact:
+      vpc_id:  "{{ VPC_ID.stdout }}"
+
+      #  - debug: var=vpc_id
+  - name: TO get VPC_ID (defult)
+    command: aws ec2 describe-vpcs --filter Name=tag:Name,Values=Default --query Vpcs[].VpcId --region us-east-2 --output text
+    register: VPC_ID_default
+
+  - name: Set VPC ID in variable
+    set_fact:
+      vpc_id_default:  "{{ VPC_ID_default.stdout }}"
+
+
+
+  - name: Create subnet first
+    ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      az: us-east-2a
+      region: us-east-2
+      cidr: 10.0.0.0/24
+      resource_tags:
+        Name: Subnet1
+
+  - name: Create subnet Second
+    ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      az: us-east-2b
+      region: us-east-2
+      cidr: 10.0.1.0/24
+      resource_tags:
+        Name: Subnet2
+
+  - name: Create subnet Third
+    ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      az: us-east-2c
+      region: us-east-2
+      cidr: 10.0.2.0/24
+      resource_tags:
+        Name: Subnet3
+
+  - name: MY-IGW
+    ec2_vpc_igw:
+      vpc_id: "{{ vpc_id }}"
+      state: present
+      region: us-east-2
+      resource_tags:
+        Name: my-igw
+    register: igw
+
+  - name: TO get subnet_ID1
+    command: aws ec2 describe-subnets --region us-east-2 --filters Name=tag:Name,Values=Subnet1 --query Subnets[].SubnetId --output text
+    register: subnet_ID1
+
+  - name: Set subnet ID in variable
+    set_fact:
+      subnet_id1:  "{{ subnet_ID1.stdout }}"
+
+
+  - name: TO get subnet_ID2
+    command: aws ec2 describe-subnets --region us-east-2 --filters Name=tag:Name,Values=Subnet2 --query Subnets[].SubnetId --output text
+    register: subnet_ID2
+
+  - name: Set subnet ID in variable
+    set_fact:
+      subnet_id2:  "{{ subnet_ID2.stdout }}"
+
+
+
+  - name: TO get subnet_ID3
+    command: aws ec2 describe-subnets --region us-east-2 --filters Name=tag:Name,Values=Subnet3 --query Subnets[].SubnetId --output text
+    register: subnet_ID3
+
+  - name: Set subnet ID in variable
+    set_fact:
+      subnet_id3:  "{{ subnet_ID3.stdout }}"
+
+
+
+  - name: TO get IGW_ID (custom)
+    command: aws ec2 describe-internet-gateways --region us-east-2 --filters Name=tag:Name,Values=my-igw  --query InternetGateways[].InternetGatewayId --output text
+    register: IGW_ID
+
+  - name: Set IGW ID in variable
+    set_fact:
+      igw_id:  "{{ IGW_ID.stdout }}"
+
+#########################################################
+
+  - name: Creating  VPC peering Connection (named as mine_peer)
+    ec2_vpc_peer:
+      region: us-east-2
+      vpc_id: "{{ vpc_id }}"
+      peer_vpc_id: "{{ vpc_id_default }}"
+      state: present
+      tags:
+        Name: mine_peer 
+    register: vpc_peer
+
+  - name: Accept local VPC peering request
+    ec2_vpc_peer:
+      region: us-east-2
+      peering_id: "{{ vpc_peer.peering_id }}"
+      state: accept
+    register: action_peer
+
+######################################
+  - name: TO get vpc-peering-id
+    command: aws ec2 describe-vpc-peering-connections --region us-east-2 --filters Name=tag:Name,Values="mine_peer" --query VpcPeeringConnections[].VpcPeeringConnectionId --output text
+    register: vpc_peer_id
+
+  - name: Set vpc-peer-id in variable
+    set_fact:
+      vpc_peer:  "{{ vpc_peer_id.stdout }}"
+
+
+  - name: Set up public subnet route table
+    ec2_vpc_route_table:
+      vpc_id: "{{ vpc_id }}"
+      region: us-east-2
+      tags:
+        Name: Public rt
+      subnets:
+        - "{{ subnet_id1 }}"
+        - "{{ subnet_id2 }}"
+        - "{{ subnet_id3 }}"
+
+      routes:
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ igw_id }}"
+        - dest: 172.31.0.0/16
+          vpc_peering_connection_id: "{{vpc_peer}}"
+    register: public_route_table
+
+    #  - name: Set up private subnet route table
+    #ec2_vpc_route_table:
+    # vpc_id: "{{ vpc_id }}"
+    # region: us-east-2
+    # tags:
+    #   Name: Private rt
+    # subnets:
+    #   - "{{ subnet_id2 }}"
+    #   - "{{ subnet_id3 }}"
+    # routes:
+    #   - dest: 172.31.0.0/16
+    #     vpc_peering_connection_id: "{{vpc_peer}}"
+              # - dest: 0.0.0.0/0
+          #         gateway_id: "{{ igw_id }}"
+          #    register: public_route_table
+          #
+  - name: Set up default subnet route table
+    ec2_vpc_route_table:
+      vpc_id: "{{ vpc_id_default }}"
+      region: us-east-2
+      route_table_id: rtb-882778e3
+      routes:
+        - dest: 10.0.0.0/16 
+          vpc_peering_connection_id: "{{vpc_peer}}"
+        - dest: 0.0.0.0/16
+          gateway_id: igw-2b546443
+
+  - name: vm1 creating with public ip
+    ec2:
+      instance_type: t2.micro
+      image: ami-00399ec92321828f5
+      key_name: mine-ohio
+      region: us-east-2
+      vpc_subnet_id:  "{{ subnet_id1 }}"
+      assign_public_ip: yes
+      count: 1
+      user_data: |
+             #!/bin/sh
+             apt-get update -y
+             sudo adduser pawan --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+             echo "pawan:12345" | sudo chpasswd
+             mkdir -p /home/pawan/.ssh
+             touch /home/pawan/.ssh/authorized_keys
+             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys
+             chmod -R 700 /home/pawan/.ssh/
+             echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
+             chown -R pawan.pawan /home/pawan/.ssh
+      instance_tags:
+        Name: VM1
+        ES: 1
+  - name: vm2 creating with private ip
+    ec2:
+      instance_type: t2.micro
+      image: ami-00399ec92321828f5
+      key_name: mine-ohio
+      region: us-east-2
+      vpc_subnet_id:  "{{ subnet_id2 }}"
+      count: 1
+      assign_public_ip: yes
+      user_data: |
+             #!/bin/sh
+             apt-get update -y
+             sudo adduser pawan --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+             echo "pawan:12345" | sudo chpasswd
+             mkdir -p /home/pawan/.ssh
+             touch /home/pawan/.ssh/authorized_keys
+             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys             
+             chmod -R 700 /home/pawan/.ssh/
+             echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
+             chown -R pawan.pawan /home/pawan/.ssh
+      instance_tags:
+        Name: VM2
+        ES: 1
+
+  - name: vm3 creating with private ip
+    ec2:
+      instance_type: t2.micro
+      image: ami-00399ec92321828f5
+      key_name: mine-ohio
+      region: us-east-2
+      vpc_subnet_id:  "{{ subnet_id3 }}"
+      count: 1
+      assign_public_ip: yes
+      user_data: |
+             #!/bin/sh
+             apt-get update -y
+             sudo adduser pawan --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+             echo "pawan:12345" | sudo chpasswd
+             mkdir -p /home/pawan/.ssh
+             touch /home/pawan/.ssh/authorized_keys
+             echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZRpv/zM8yD/+C7BUBctPVeOZb9NCxzQiqbwJ52BVSJmYhCuD4C214QmVmWilLjBRfsDqIERHOY5m6YAzp84oGRxvBzi/+5XztmoUTpFWzcUARMRR+UaD4FRRzjiwKLc+Cl4kET3qlyXEmzd1icC74xZX+ELyYOnr3I4bOThS7jiNgM8S5t9W5IXmeRxqRb2MzDJ/oEShTENHzUcuZEgJo3deIRXR31jhy2VV/RbS9X3mguPHTcB3Xf0/QclmmcPSO1rWFIDle7c/JZHdq2jOVmUrz7GkdHsqqLmgDihrRrGcuyatKXBXki0ejVCNo2HovYV1RVxtFAw0B9qmAszif pawan@ip-172-31-17-69.us-east-2.compute.internal" > /home/pawan/.ssh/authorized_keys
+             chmod -R 700 /home/pawan/.ssh/
+             echo "pawan  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/pawan
+             chown -R pawan.pawan /home/pawan/.ssh
+      instance_tags:
+        Name: VM3
+        ES: 1
+
+

@@ -2,7 +2,7 @@
 sudo yum update -y
 sudo amazon-linux-extras install ansible2 -y
 sudo yum install epel-release -y
-sudo yum install -y python-pip
+sudo yum install -y python-pip wget
 sudo pip install boto3 boto
 mkdir ansible
 cp -r /etc/ansible/* ansible/
@@ -17,4 +17,6 @@ compose:
   ansible_host: public_ip_address" > /home/pawan/ansible/inventory_aws_ec2.yml
 mkdir .ssh
 touch .ssh/authorized_keys
+chown -R pawan.pawan /home/pawan/
 chmod -R 700 .ssh
+cd /home/pawan && wget
