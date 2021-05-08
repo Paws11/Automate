@@ -20,8 +20,9 @@ touch .ssh/authorized_keys
 chown -R pawan.pawan /home/pawan/
 chmod -R 700 .ssh
 mkdir -p /home/pawan/ansible/ES
-cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es1.yml
-cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es2.yml
-cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es3.yml
+cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es1.sh
+cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es2.sh
+cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es3.sh
+cd /home/pawan/ansible/ES/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es.yml
 cd /home/pawan/ansible/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/vpc.yml
 chown -R pawan.pawan /home/pawan/
