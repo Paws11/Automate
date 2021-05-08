@@ -7,7 +7,7 @@
   gather_facts: true
   tasks:
     - name: Download the zip and execute shell
-      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es2.sh
+      shell: sudo apt-get -y install wget unzip && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es1.sh && chmod -R +x es1.sh && sudo ./es1.sh
 
 
 - name: Setup ElasticSearch
@@ -18,8 +18,7 @@
   gather_facts: true
   tasks:
     - name: Download the zip and execute shell
-      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es2.sh
-
+      shell: sudo apt-get -y install wget unzip && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es2.sh && chmod -R +x es2.sh && sudo ./es2.sh
 
 - name: Setup ElasticSearch
   hosts: _ES_3
@@ -29,5 +28,4 @@
   gather_facts: true
   tasks:
     - name: Download the zip and execute shell
-      shell: sudo apt-get -y install wget unzip && wget https://github.com/Paws11/ES/archive/refs/heads/main.zip && unzip main.zip && chmod -R +x ES-main/ && sudo ./ES-main/es3.sh
-
+      shell: sudo apt-get -y install wget unzip && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es3.sh && chmod -R +x es3.sh && sudo ./es3.sh
