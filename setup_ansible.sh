@@ -14,7 +14,7 @@ keyed_groups:
 filters:
   instance-state-name : running
 compose:
-  ansible_host: public_ip_address" > /home/pawan/ansible/inventory_aws_ec2.yml
+  ansible_host: private_ip_address" > /home/pawan/ansible/inventory_aws_ec2.yml
 mkdir .ssh
 touch .ssh/authorized_keys
 chown -R pawan.pawan /home/pawan/
