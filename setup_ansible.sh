@@ -19,4 +19,5 @@ mkdir .ssh
 touch .ssh/authorized_keys
 chown -R pawan.pawan /home/pawan/
 chmod -R 700 .ssh
-cd /home/pawan && wget https://raw.githubusercontent.com/Paws11/Automate/master/vpc.yml
+
+cd /home/pawan/ansible/ && wget https://raw.githubusercontent.com/Paws11/Automate/master/vpc.yml
