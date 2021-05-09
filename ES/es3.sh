@@ -12,8 +12,8 @@ path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 network.host: 0.0.0.0
 http.port: 9200
-discovery.seed_hosts: ["10.0.0.221", "10.0.1.92", "10.0.2.128"]
-cluster.initial_master_nodes: ["10.0.0.221"]
+discovery.seed_hosts: ["10.0.0.66", "10.0.1.25", "10.0.2.234", "10.0.2.31"]
+cluster.initial_master_nodes: ["10.0.0.66"]
 
 #######################################
 " > /etc/elasticsearch/elasticsearch.yml
