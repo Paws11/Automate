@@ -12,8 +12,8 @@ path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 network.host: 0.0.0.0
 http.port: 9200
-discovery.seed_hosts: ["10.0.0.92", "10.0.1.240", "10.0.2.168"]
-cluster.initial_master_nodes: ["10.0.0.92"]
+discovery.seed_hosts: ["10.0.0.221", "10.0.1.92", "10.0.2.128"]
+cluster.initial_master_nodes: ["10.0.0.221"]
 
 
 #######################################
