@@ -31,12 +31,4 @@
       shell: sudo apt-get -y install wget unzip && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es3.sh && chmod -R +x es3.sh && sudo ./es3.sh
       
  
-- name: Setup ElasticSearch
-  hosts: _ES_4
-  connection: ssh
-  become: true
-  become_user: pawan
-  gather_facts: true
-  tasks:
-    - name: Download the zip and execute shell
-      shell: sudo apt-get -y install wget unzip && wget https://raw.githubusercontent.com/Paws11/Automate/master/ES/es4.sh && chmod -R +x es3.sh && sudo ./es4.sh
+
